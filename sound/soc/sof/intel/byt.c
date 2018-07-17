@@ -270,11 +270,6 @@ static int byt_fw_ready(struct snd_sof_dev *sdev, u32 msg_id)
 	/* copy data from the DSP FW ready offset */
 	byt_block_read(sdev, offset, fw_ready, sizeof(*fw_ready));
 
-	snd_sof_dsp_mailbox_init(sdev, fw_ready->dspbox_offset,
-				 fw_ready->dspbox_size,
-				 fw_ready->hostbox_offset,
-				 fw_ready->hostbox_size);
-
 	dev_info(sdev->dev,
 		 " Firmware info: version %d:%d-%s build %d on %s:%s\n",
 		 v->major, v->minor, v->tag, v->build, v->date, v->time);
@@ -282,6 +277,11 @@ static int byt_fw_ready(struct snd_sof_dev *sdev, u32 msg_id)
 	/* now check for extended data */
 	snd_sof_fw_parse_ext_data(sdev, MBOX_OFFSET +
 				  sizeof(struct sof_ipc_fw_ready));
+
+	snd_sof_dsp_mailbox_init(sdev, sdev->info_window->window[0].offset,
+		 sdev->info_window->window[0].size,
+		 sdev->info_window->window[1].offset,
+		 sdev->info_window->window[1].size);
 
 	byt_get_windows(sdev);
 
